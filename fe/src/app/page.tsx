@@ -4,6 +4,7 @@
 
 import Image from "next/image";
 import Link from 'next/link';
+import ProjectItem from "./components/ProjectItem"
 import {useState, useEffect} from "react";
 
 
@@ -11,9 +12,10 @@ export default function Home() {
 
   const [projects, setProjects] = useState([])
 
-  useEffect(() => {async function rawData(){
+  useEffect(() => {
+    async function rawData(){
     try{
-      const res = await fetch(`${process.env.STRAPI_URL}/api/projects?populate=*`)
+      const res = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_URL}/api/projects?populate=*`)
       if (!res.ok) throw new Error(`Failed to fetch, status ${res.status}`);
       const json = await res.json()
       setProjects(json.data)
@@ -35,12 +37,17 @@ export default function Home() {
     </header>
     <main >
     <h1>Projects</h1>
-    <ul>
-    {projects.map((project: Project[])=>
-      <li key={project.id}>{project.title}
-      <Image src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${project?.screenshot?.url}`} width={150} height={150} alt={project.title} unoptimized/>
-      <Link className="bg-sky-500" href={project.github_url}  target="_blank" rel="noopener noreferrer">Link</Link>
-      </li>)}
+    <ul className = "grid grid-cols-3 content-start gap-2">
+
+    {projects.map((project: Project) => (
+          <ProjectItem
+            key={project.id}
+            title={project.title}
+            summary={project.summary ?? 'No summary'}
+            screenshot={`${process.env.NEXT_PUBLIC_STRAPI_URL}${project?.screenshot?.url}` ?? ''}
+            github_url={project.github_url || '#'}/>
+        ))}
+    
     </ul>
     </main>
     <footer>
